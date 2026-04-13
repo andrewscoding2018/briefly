@@ -15,6 +15,8 @@ Briefly will begin as a local-first desktop application that helps users identif
 The Phase 1 product target, persona, success metrics, and non-goals are defined in the [Phase 1 product specification](phase-1-product-spec.md).
 The deterministic thread-ranking contract is defined in the [Phase 1 signal scoring rubric](signal-scoring-rubric.md).
 
+The Phase 1 normalized schema, persistence boundaries, and update rules are defined in the [local data model](local-data-model.md) and [mailbox ingestion specification](phase-1-mailbox-ingestion-spec.md).
+
 ## Non-Goals
 
 - Live IMAP or Gmail sync in Phase 1
@@ -104,6 +106,8 @@ The architecture must preserve one critical property: the core product loop rema
 - AI adapter owns optional enrichment only and must never become a hard dependency for Phase 1 value.
 
 ## Domain Entities
+
+The entities below describe the planning-level domain surface. The schema-oriented source of truth for persisted fields, keys, relationships, and re-import or rescoring behavior lives in the [local data model](local-data-model.md).
 
 ### `Message`
 
@@ -221,7 +225,7 @@ The exact Phase 1 weights, penalties, and explanation contract are defined in th
 
 ## Open Questions and Deferred Decisions
 
-- What is the precise normalized schema and deduplication policy for repeated imports?
+- What exact SQLite DDL, migrations, and index tuning should implement the documented local data model?
 - How should thread reconstruction behave when standard headers are missing or inconsistent?
 - What scoring weights best reflect the desired meaning of "signals-first"?
 - Which specific DigitalOcean endpoint style and model fallback policy should be used in Phase 2?
