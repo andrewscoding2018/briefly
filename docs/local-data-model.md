@@ -295,7 +295,7 @@ Derived thread-level scoring outputs used by the dashboard.
 | `urgency_score` | real | Deterministic heuristic |
 | `actionability_score` | real | Deterministic heuristic |
 | `priority_score` | real | Dashboard sort key |
-| `explanation_json` | text nullable | Machine-readable explanation payload |
+| `explanation_json` | text nullable | Machine-readable explanation payload defined by the scoring rubric |
 | `is_current` | boolean | Latest run marker |
 | `computed_at` | datetime | Snapshot time |
 

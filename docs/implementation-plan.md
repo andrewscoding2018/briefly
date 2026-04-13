@@ -13,6 +13,7 @@ Briefly will begin as a local-first desktop application that helps users identif
 - Create a discovery backlog that resolves product and data-model gaps before repo scaffolding begins.
 
 The Phase 1 product target, persona, success metrics, and non-goals are defined in the [Phase 1 product specification](phase-1-product-spec.md).
+The deterministic thread-ranking contract is defined in the [Phase 1 signal scoring rubric](signal-scoring-rubric.md).
 
 ## Non-Goals
 
@@ -216,7 +217,7 @@ The first scoring pass should combine documented heuristics rather than opaque m
 - thread activity and freshness
 - action-oriented language cues
 
-The exact weightings are intentionally deferred to the backlog issue dedicated to the scoring rubric.
+The exact Phase 1 weights, penalties, and explanation contract are defined in the [signal scoring rubric](signal-scoring-rubric.md).
 
 ## Open Questions and Deferred Decisions
 
