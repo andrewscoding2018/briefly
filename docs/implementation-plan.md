@@ -12,6 +12,8 @@ Briefly will begin as a local-first desktop application that helps users identif
 - Define stable domain entities and service boundaries for ingestion, storage, scoring, and presentation.
 - Create a discovery backlog that resolves product and data-model gaps before repo scaffolding begins.
 
+The Phase 1 product target, persona, success metrics, and non-goals are defined in the [Phase 1 product specification](phase-1-product-spec.md).
+
 ## Non-Goals
 
 - Live IMAP or Gmail sync in Phase 1
@@ -218,8 +220,6 @@ The exact weightings are intentionally deferred to the backlog issue dedicated t
 
 ## Open Questions and Deferred Decisions
 
-- What specific user persona is the Phase 1 demo optimized for?
-- What mailbox size should be treated as the minimum demo dataset?
 - What is the precise normalized schema and deduplication policy for repeated imports?
 - How should thread reconstruction behave when standard headers are missing or inconsistent?
 - What scoring weights best reflect the desired meaning of "signals-first"?
