@@ -1,0 +1,8 @@
+[package]
+name = "briefly-ai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+briefly-contracts = { path = "../briefly-contracts" }

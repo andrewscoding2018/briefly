@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Briefly",
+  "version": "0.1.0",
+  "identifier": "com.briefly.app",
+  "build": {
+    "frontendDist": "../.next",
+    "devUrl": "http://localhost:3000"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Briefly",
+        "width": 1280,
+        "height": 820,
+        "resizable": true
+      }
+    ]
+  }
+}

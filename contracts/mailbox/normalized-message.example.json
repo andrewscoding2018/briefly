@@ -1,0 +1,12 @@
+{
+  "message_key": "msg_01jbootstrap",
+  "thread_id": "thr_01jbootstrap",
+  "subject": "Can you review the investor update?",
+  "canonical_subject": "review the investor update",
+  "sender": {
+    "email": "founder@example.com",
+    "display_name": "Founder"
+  },
+  "sent_at": "2026-04-13T08:15:00Z",
+  "body_preview": "Can you review this before tomorrow morning?"
+}

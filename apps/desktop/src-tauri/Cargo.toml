@@ -1,0 +1,8 @@
+[package]
+name = "briefly-desktop-shell"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+briefly-contracts = { path = "../../../crates/briefly-contracts" }
