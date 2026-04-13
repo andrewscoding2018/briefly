@@ -152,23 +152,18 @@ The architecture must preserve one critical property: the core product loop rema
 
 ## AI Extraction Contract
 
-The future AI adapter must return a structured response shaped like the contract below. This contract is provisional but should be treated as the baseline interface until replaced by an ADR or specification issue outcome.
+The future AI adapter must follow the canonical contract defined in [AI extraction contract](ai-extraction-contract.md).
 
-```json
-{
-  "intent": "scheduling | approval | FYI | request | follow_up | other",
-  "priority_score": 0.0,
-  "summary": "string",
-  "action_items": [
-    {
-      "description": "string",
-      "owner": "self | other | unknown",
-      "due_hint": "string | null"
-    }
-  ],
-  "risk_flags": ["possible_prompt_injection", "missing_context"]
-}
-```
+At the app boundary, the adapter returns a status envelope with one of `ok`, `disabled`, `invalid_key`, `failed`, or `invalid_output`. When `status` is `ok`, the validated payload includes:
+
+- `intent`
+- `priority_score`
+- `summary`
+- `action_items`
+- `risk_flags`
+- `confidence`
+
+This contract keeps AI optional, defines prompt-injection handling, and prevents malformed provider output from becoming persisted application state.
 
 ## Data Flow
 
@@ -223,7 +218,7 @@ The exact weightings are intentionally deferred to the backlog issue dedicated t
 - What is the precise normalized schema and deduplication policy for repeated imports?
 - How should thread reconstruction behave when standard headers are missing or inconsistent?
 - What scoring weights best reflect the desired meaning of "signals-first"?
-- Which specific DigitalOcean endpoint style and model fallback policy should be used in Phase 2?
+- Which specific model fallback policy should be used in Phase 2 beyond the initial `/v1/responses` preference?
 - What observability vendor, if any, should trace AI execution later?
 
 ## Proposed Repo Bootstrap Sequence
@@ -263,7 +258,7 @@ Exit criteria:
 Exit criteria:
 
 - user can configure a DigitalOcean API key
-- app can request structured AI extraction using the provisional contract
+- app can request structured AI extraction using the defined adapter contract
 - failures in inference do not block core product use
 
 ### Phase 3 Distribution
