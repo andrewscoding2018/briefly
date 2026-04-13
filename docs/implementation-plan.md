@@ -230,7 +230,7 @@ The exact Phase 1 weights, penalties, and explanation contract are defined in th
 
 1. Finalize the docs in this repository.
 2. Resolve the initial GitHub discovery/specification issues.
-3. Scaffold the repo structure for Tauri, frontend, and Rust services.
+3. Use the [repo bootstrap plan](repo-bootstrap-plan.md) to scaffold the repo structure for Tauri, frontend, Rust services, contracts, and fixtures.
 4. Implement `.mbox` ingestion and normalized persistence.
 5. Implement deterministic scoring and dashboard read paths.
 6. Add the morning briefing view using local placeholder generation.

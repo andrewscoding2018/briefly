@@ -56,6 +56,7 @@ Phase 1 is intentionally useful without any cloud dependency or AI provider conf
 ## Repository Guide
 
 - [Implementation plan](docs/implementation-plan.md)
+- [Repo bootstrap plan](docs/repo-bootstrap-plan.md)
 - [AI extraction contract](docs/ai-extraction-contract.md)
 - [Local data model](docs/local-data-model.md)
 - [Phase 1 product specification](docs/phase-1-product-spec.md)
@@ -64,4 +65,7 @@ Phase 1 is intentionally useful without any cloud dependency or AI provider conf
 
 ## Current Status
 
-This repository is currently in architecture-definition mode. The baseline product direction, interfaces, and backlog are being documented before any app scaffolding or implementation work begins.
+This repository has an initial bootstrap skeleton for the desktop app, Rust
+workspace, contracts, and fixtures. The baseline product direction, interfaces,
+and backlog are still being documented before ingestion, persistence, and
+scoring logic are implemented in earnest.

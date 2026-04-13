@@ -1,0 +1,20 @@
+[workspace]
+members = [
+  "apps/desktop/src-tauri",
+  "crates/briefly-ai",
+  "crates/briefly-briefing",
+  "crates/briefly-contracts",
+  "crates/briefly-ingest",
+  "crates/briefly-score",
+  "crates/briefly-store"
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+version = "0.1.0"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

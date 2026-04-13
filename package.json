@@ -1,0 +1,11 @@
+{
+  "name": "briefly",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "pnpm --filter desktop dev",
+    "build": "pnpm --filter desktop build",
+    "lint": "pnpm --filter desktop lint",
+    "test": "pnpm --filter desktop test"
+  }
+}
