@@ -57,7 +57,9 @@ Phase 1 is intentionally useful without any cloud dependency or AI provider conf
 
 - [Implementation plan](docs/implementation-plan.md)
 - [AI extraction contract](docs/ai-extraction-contract.md)
+- [Local data model](docs/local-data-model.md)
 - [Phase 1 product specification](docs/phase-1-product-spec.md)
+- [Signal scoring rubric](docs/signal-scoring-rubric.md)
 - [Architecture decision records](docs/adr/README.md)
 
 ## Current Status
