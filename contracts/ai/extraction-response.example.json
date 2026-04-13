@@ -4,9 +4,7 @@
     "intent": "review_request",
     "priority_score": 0.74,
     "summary": "A trusted sender asked for review before tomorrow morning.",
-    "action_items": [
-      "Review the investor update"
-    ],
+    "action_items": ["Review the investor update"],
     "risk_flags": [],
     "confidence": 0.81
   }

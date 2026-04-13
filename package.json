@@ -3,9 +3,28 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
+    "install:js": "pnpm install",
     "dev": "pnpm --filter desktop dev",
-    "build": "pnpm --filter desktop build",
-    "lint": "pnpm --filter desktop lint",
-    "test": "pnpm --filter desktop test"
+    "build": "pnpm build:js && pnpm build:rust",
+    "build:js": "pnpm --filter desktop build",
+    "build:rust": "cargo build --workspace",
+    "lint": "pnpm lint:js && pnpm lint:rust && pnpm lint:json",
+    "lint:js": "pnpm --filter desktop lint",
+    "lint:rust": "cargo clippy --workspace --all-targets -- -D warnings",
+    "lint:json": "node scripts/validate-json.mjs",
+    "format": "pnpm format:js && pnpm format:rust",
+    "format:check": "pnpm format:js:check && pnpm format:rust:check",
+    "format:js": "prettier --write .",
+    "format:js:check": "prettier --check .",
+    "format:rust": "cargo fmt --all",
+    "format:rust:check": "cargo fmt --all --check",
+    "test": "pnpm test:js && pnpm test:rust",
+    "test:js": "pnpm --filter desktop test",
+    "test:rust": "cargo test --workspace"
+  },
+  "devDependencies": {
+    "eslint": "9.25.1",
+    "eslint-config-next": "15.3.0",
+    "prettier": "3.5.3"
   }
 }

@@ -276,13 +276,13 @@ Exit criteria:
 
 ## Risk Register
 
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| Mailbox parsing complexity is higher than expected | Delays MVP ingestion work | Start with `.mbox` only, constrain supported inputs, and document malformed message handling early |
-| Thread reconstruction is inconsistent across exports | Ranking quality drops | Define a normalization contract and fallback rules before implementation |
-| AI integration creates trust or prompt-injection risk | User confidence erodes | Keep AI optional, isolate prompt contracts, and flag suspicious output |
-| Performance degrades on larger demo mailboxes | Demo feels unreliable | Set explicit demo-size targets and test import/scoring on representative data |
-| Scope drifts toward full email client behavior | MVP slips | Keep non-goals explicit and open issues for deferred capabilities instead of absorbing them into Phase 1 |
+| Risk                                                  | Impact                    | Mitigation                                                                                               |
+| ----------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Mailbox parsing complexity is higher than expected    | Delays MVP ingestion work | Start with `.mbox` only, constrain supported inputs, and document malformed message handling early       |
+| Thread reconstruction is inconsistent across exports  | Ranking quality drops     | Define a normalization contract and fallback rules before implementation                                 |
+| AI integration creates trust or prompt-injection risk | User confidence erodes    | Keep AI optional, isolate prompt contracts, and flag suspicious output                                   |
+| Performance degrades on larger demo mailboxes         | Demo feels unreliable     | Set explicit demo-size targets and test import/scoring on representative data                            |
+| Scope drifts toward full email client behavior        | MVP slips                 | Keep non-goals explicit and open issues for deferred capabilities instead of absorbing them into Phase 1 |
 
 ## Acceptance Criteria
 
