@@ -17,6 +17,8 @@ Closes #<number>
 
 <!-- - DB changes? Document the migration (what/why and rollback). -->
 <!-- - Backend changes? Add/modify unit tests. -->
+<!-- - `main` requires GitHub Actions jobs `lint`, `build`, and `test` to pass before merge. -->
+<!-- - Branches should be up to date with `main` before merge. -->
 <!-- - Run `pnpm lint`, `pnpm build`, and `pnpm test` from the repo root before merge. -->
 
 ---
@@ -25,6 +27,7 @@ Closes #<number>
 
 - [ ] Linked issue included (`Closes #123`)
 - [ ] Ran `pnpm lint`, `pnpm build`, and `pnpm test` from the repo root
+- [ ] PR is up to date with `main` before merge
 - [ ] Backend changes include new/updated unit test(s)
 - [ ] DB migration documented (path: `docs/db/` or ADR)
 - [ ] PR size ≤ 200 lines changed (additions + deletions)
