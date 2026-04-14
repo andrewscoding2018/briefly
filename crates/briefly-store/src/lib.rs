@@ -143,9 +143,7 @@ mod tests {
     #[test]
     fn repository_boundaries_are_split_between_canonical_and_derived_data() {
         assert_eq!(REPOSITORY_BOUNDARIES.len(), 2);
-        assert!(REPOSITORY_BOUNDARIES
-            .iter()
-            .any(|boundary| *boundary == RepositoryBoundary::CanonicalMail));
+        assert!(REPOSITORY_BOUNDARIES.contains(&RepositoryBoundary::CanonicalMail));
         assert!(REPOSITORY_BOUNDARIES
             .iter()
             .any(|boundary| { boundary.description().contains("scoring runs") }));
