@@ -179,8 +179,8 @@ Minimum shape:
   "component_scores": {
     "relationship_score": 0.82,
     "actionability_score": 0.65,
-    "urgency_score": 0.40,
-    "recency_score": 0.80,
+    "urgency_score": 0.4,
+    "recency_score": 0.8,
     "priority_score": 0.69
   },
   "matched_signals": [
@@ -188,9 +188,7 @@ Minimum shape:
     "ask_language_present",
     "recent_back_and_forth"
   ],
-  "applied_penalties": [
-    "bulk_noise_partial"
-  ]
+  "applied_penalties": ["bulk_noise_partial"]
 }
 ```
 

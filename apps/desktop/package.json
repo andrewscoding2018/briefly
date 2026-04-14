@@ -5,7 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false ../../node_modules/.bin/eslint . --max-warnings=0",
     "test": "node --test tests/**/*.test.mjs"
   },
   "dependencies": {

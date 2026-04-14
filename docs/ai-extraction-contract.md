@@ -59,10 +59,7 @@ The rest of the app should consume an adapter result envelope rather than raw pr
         "due_hint": "string | null"
       }
     ],
-    "risk_flags": [
-      "possible_prompt_injection",
-      "missing_context"
-    ],
+    "risk_flags": ["possible_prompt_injection", "missing_context"],
     "confidence": 0.0
   },
   "errors": [
@@ -87,14 +84,14 @@ Rules:
 
 ### Required Fields
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `intent` | enum | One of `scheduling`, `approval`, `fyi`, `request`, `follow_up`, `other` |
-| `priority_score` | number | Normalized float in the inclusive range `0.0` to `1.0` |
-| `summary` | string | Plain-language thread summary, 1 to 320 characters |
-| `action_items` | array | Zero to 5 items |
-| `risk_flags` | array | Zero or more known risk flags |
-| `confidence` | number | Normalized float in the inclusive range `0.0` to `1.0` |
+| Field            | Type   | Rules                                                                   |
+| ---------------- | ------ | ----------------------------------------------------------------------- |
+| `intent`         | enum   | One of `scheduling`, `approval`, `fyi`, `request`, `follow_up`, `other` |
+| `priority_score` | number | Normalized float in the inclusive range `0.0` to `1.0`                  |
+| `summary`        | string | Plain-language thread summary, 1 to 320 characters                      |
+| `action_items`   | array  | Zero to 5 items                                                         |
+| `risk_flags`     | array  | Zero or more known risk flags                                           |
+| `confidence`     | number | Normalized float in the inclusive range `0.0` to `1.0`                  |
 
 ### `action_items`
 

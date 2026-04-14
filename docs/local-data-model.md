@@ -72,21 +72,21 @@ This issue is documentation-only, so it does not change runtime behavior. The pr
 
 One row per user import attempt.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `import_batch_id` | text pk | Opaque local ID |
-| `source_path` | text | Original user-selected file path at import time |
-| `source_filename` | text | Convenience display value |
-| `source_sha256` | text | File fingerprint for repeatability |
-| `file_size_bytes` | integer | Import diagnostics |
-| `parser_version` | text | Parser/normalizer version used |
-| `status` | text | `running`, `completed`, `partial`, `failed` |
-| `started_at` | datetime | Import start |
-| `completed_at` | datetime nullable | Import completion |
-| `message_count_seen` | integer | Raw messages encountered |
-| `message_count_linked` | integer | Messages linked to canonical rows |
-| `parse_error_count` | integer | Diagnostics |
-| `notes` | text nullable | Human-readable import error summary |
+| Field                  | Type              | Notes                                           |
+| ---------------------- | ----------------- | ----------------------------------------------- |
+| `import_batch_id`      | text pk           | Opaque local ID                                 |
+| `source_path`          | text              | Original user-selected file path at import time |
+| `source_filename`      | text              | Convenience display value                       |
+| `source_sha256`        | text              | File fingerprint for repeatability              |
+| `file_size_bytes`      | integer           | Import diagnostics                              |
+| `parser_version`       | text              | Parser/normalizer version used                  |
+| `status`               | text              | `running`, `completed`, `partial`, `failed`     |
+| `started_at`           | datetime          | Import start                                    |
+| `completed_at`         | datetime nullable | Import completion                               |
+| `message_count_seen`   | integer           | Raw messages encountered                        |
+| `message_count_linked` | integer           | Messages linked to canonical rows               |
+| `parse_error_count`    | integer           | Diagnostics                                     |
+| `notes`                | text nullable     | Human-readable import error summary             |
 
 Indexes:
 
@@ -102,18 +102,18 @@ Rationale:
 
 Immutable import-level source records. This table preserves what was seen in a specific import batch even when the canonical message already exists.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `source_record_id` | text pk | Opaque local ID |
-| `import_batch_id` | text fk | References `import_batches` |
-| `message_id` | text fk nullable | References canonical `messages` row after normalization |
-| `mailbox_path` | text nullable | Folder/mailbox path within the import |
-| `source_position` | integer nullable | Stable mailbox order when available |
-| `raw_message_sha256` | text | Raw record fingerprint |
-| `header_blob` | text nullable | Serialized parsed headers for debugging |
-| `parse_status` | text | `parsed`, `partial`, `failed` |
-| `parse_error` | text nullable | Parse failure details |
-| `created_at` | datetime | Ingest timestamp |
+| Field                | Type             | Notes                                                   |
+| -------------------- | ---------------- | ------------------------------------------------------- |
+| `source_record_id`   | text pk          | Opaque local ID                                         |
+| `import_batch_id`    | text fk          | References `import_batches`                             |
+| `message_id`         | text fk nullable | References canonical `messages` row after normalization |
+| `mailbox_path`       | text nullable    | Folder/mailbox path within the import                   |
+| `source_position`    | integer nullable | Stable mailbox order when available                     |
+| `raw_message_sha256` | text             | Raw record fingerprint                                  |
+| `header_blob`        | text nullable    | Serialized parsed headers for debugging                 |
+| `parse_status`       | text             | `parsed`, `partial`, `failed`                           |
+| `parse_error`        | text nullable    | Parse failure details                                   |
+| `created_at`         | datetime         | Ingest timestamp                                        |
 
 Indexes:
 
@@ -130,16 +130,16 @@ Rationale:
 
 Canonical participant identities. This table stores stable identity attributes only, not time-varying scores.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `participant_id` | text pk | Opaque local ID |
-| `normalized_email` | text unique | Lowercased canonical address |
-| `display_name` | text nullable | Most recent best-known display name |
-| `organization_hint` | text nullable | Derived domain/company hint |
-| `first_seen_at` | datetime | Earliest linked message time |
-| `last_seen_at` | datetime | Latest linked message time |
-| `created_at` | datetime | Row creation |
-| `updated_at` | datetime | Metadata refresh timestamp |
+| Field               | Type          | Notes                               |
+| ------------------- | ------------- | ----------------------------------- |
+| `participant_id`    | text pk       | Opaque local ID                     |
+| `normalized_email`  | text unique   | Lowercased canonical address        |
+| `display_name`      | text nullable | Most recent best-known display name |
+| `organization_hint` | text nullable | Derived domain/company hint         |
+| `first_seen_at`     | datetime      | Earliest linked message time        |
+| `last_seen_at`      | datetime      | Latest linked message time          |
+| `created_at`        | datetime      | Row creation                        |
+| `updated_at`        | datetime      | Metadata refresh timestamp          |
 
 Indexes:
 
@@ -155,22 +155,22 @@ Decision:
 
 Canonical message records deduplicated across imports.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `message_id` | text pk | Opaque local ID |
-| `canonical_message_key` | text unique | Deterministic dedupe key |
-| `internet_message_id` | text nullable | RFC `Message-ID` when available |
-| `thread_id` | text fk | References `threads` |
-| `subject` | text nullable | Raw subject |
-| `normalized_subject` | text nullable | Subject stripped of reply prefixes |
-| `sent_at` | datetime nullable | Message timestamp |
-| `sender_participant_id` | text fk nullable | References `participants` |
-| `body_text` | text nullable | Plaintext content |
-| `body_preview` | text nullable | Short UI preview |
-| `has_attachments` | boolean | Attachment hint |
-| `import_first_seen_batch_id` | text fk | First batch that created this canonical row |
-| `created_at` | datetime | Canonical row creation |
-| `updated_at` | datetime | Last normalization update |
+| Field                        | Type              | Notes                                       |
+| ---------------------------- | ----------------- | ------------------------------------------- |
+| `message_id`                 | text pk           | Opaque local ID                             |
+| `canonical_message_key`      | text unique       | Deterministic dedupe key                    |
+| `internet_message_id`        | text nullable     | RFC `Message-ID` when available             |
+| `thread_id`                  | text fk           | References `threads`                        |
+| `subject`                    | text nullable     | Raw subject                                 |
+| `normalized_subject`         | text nullable     | Subject stripped of reply prefixes          |
+| `sent_at`                    | datetime nullable | Message timestamp                           |
+| `sender_participant_id`      | text fk nullable  | References `participants`                   |
+| `body_text`                  | text nullable     | Plaintext content                           |
+| `body_preview`               | text nullable     | Short UI preview                            |
+| `has_attachments`            | boolean           | Attachment hint                             |
+| `import_first_seen_batch_id` | text fk           | First batch that created this canonical row |
+| `created_at`                 | datetime          | Canonical row creation                      |
+| `updated_at`                 | datetime          | Last normalization update                   |
 
 Indexes:
 
@@ -189,12 +189,12 @@ Canonical key rules:
 
 Join table for recipients and other per-message participant roles.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `message_id` | text fk | References `messages` |
-| `participant_id` | text fk | References `participants` |
-| `role` | text | `to`, `cc`, `bcc`, `reply_to` |
-| `position` | integer | Preserves original recipient order |
+| Field            | Type    | Notes                              |
+| ---------------- | ------- | ---------------------------------- |
+| `message_id`     | text fk | References `messages`              |
+| `participant_id` | text fk | References `participants`          |
+| `role`           | text    | `to`, `cc`, `bcc`, `reply_to`      |
+| `position`       | integer | Preserves original recipient order |
 
 Primary key:
 
@@ -208,17 +208,17 @@ Indexes:
 
 Canonical thread containers used by the dashboard, scoring, and briefing systems.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `thread_id` | text pk | Opaque local ID |
-| `thread_key` | text unique | Deterministic threading key |
-| `canonical_subject` | text nullable | Stable display subject |
-| `latest_message_at` | datetime nullable | Cached read optimization |
-| `message_count` | integer | Cached read optimization |
-| `participant_count` | integer | Cached read optimization |
-| `threading_version` | text | Version of threading logic |
-| `created_at` | datetime | Row creation |
-| `updated_at` | datetime | Cache refresh timestamp |
+| Field               | Type              | Notes                       |
+| ------------------- | ----------------- | --------------------------- |
+| `thread_id`         | text pk           | Opaque local ID             |
+| `thread_key`        | text unique       | Deterministic threading key |
+| `canonical_subject` | text nullable     | Stable display subject      |
+| `latest_message_at` | datetime nullable | Cached read optimization    |
+| `message_count`     | integer           | Cached read optimization    |
+| `participant_count` | integer           | Cached read optimization    |
+| `threading_version` | text              | Version of threading logic  |
+| `created_at`        | datetime          | Row creation                |
+| `updated_at`        | datetime          | Cache refresh timestamp     |
 
 Indexes:
 
@@ -236,15 +236,15 @@ Thread key rules:
 
 Derived participant-level relationship metrics computed from message history.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `participant_id` | text fk | References `participants` |
-| `scoring_run_id` | text fk | References `scoring_runs` |
-| `relationship_score` | real | Normalized value |
-| `interaction_count` | integer | Supporting explanation data |
+| Field                 | Type              | Notes                       |
+| --------------------- | ----------------- | --------------------------- |
+| `participant_id`      | text fk           | References `participants`   |
+| `scoring_run_id`      | text fk           | References `scoring_runs`   |
+| `relationship_score`  | real              | Normalized value            |
+| `interaction_count`   | integer           | Supporting explanation data |
 | `last_interaction_at` | datetime nullable | Supporting explanation data |
-| `is_current` | boolean | Latest run marker |
-| `computed_at` | datetime | Snapshot time |
+| `is_current`          | boolean           | Latest run marker           |
+| `computed_at`         | datetime          | Snapshot time               |
 
 Primary key:
 
@@ -263,15 +263,15 @@ Decision:
 
 One row per scoring execution over the canonical dataset.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `scoring_run_id` | text pk | Opaque local ID |
-| `trigger_import_batch_id` | text fk nullable | Import that initiated the run |
-| `scoring_version` | text | Heuristic/scoring rules version |
-| `status` | text | `running`, `completed`, `failed` |
-| `started_at` | datetime | Run start |
-| `completed_at` | datetime nullable | Run finish |
-| `notes` | text nullable | Error or operator notes |
+| Field                     | Type              | Notes                            |
+| ------------------------- | ----------------- | -------------------------------- |
+| `scoring_run_id`          | text pk           | Opaque local ID                  |
+| `trigger_import_batch_id` | text fk nullable  | Import that initiated the run    |
+| `scoring_version`         | text              | Heuristic/scoring rules version  |
+| `status`                  | text              | `running`, `completed`, `failed` |
+| `started_at`              | datetime          | Run start                        |
+| `completed_at`            | datetime nullable | Run finish                       |
+| `notes`                   | text nullable     | Error or operator notes          |
 
 Indexes:
 
@@ -287,17 +287,17 @@ Rationale:
 
 Derived thread-level scoring outputs used by the dashboard.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `thread_id` | text fk | References `threads` |
-| `scoring_run_id` | text fk | References `scoring_runs` |
-| `relationship_score` | real | Thread-level aggregate |
-| `urgency_score` | real | Deterministic heuristic |
-| `actionability_score` | real | Deterministic heuristic |
-| `priority_score` | real | Dashboard sort key |
-| `explanation_json` | text nullable | Machine-readable explanation payload defined by the scoring rubric |
-| `is_current` | boolean | Latest run marker |
-| `computed_at` | datetime | Snapshot time |
+| Field                 | Type          | Notes                                                              |
+| --------------------- | ------------- | ------------------------------------------------------------------ |
+| `thread_id`           | text fk       | References `threads`                                               |
+| `scoring_run_id`      | text fk       | References `scoring_runs`                                          |
+| `relationship_score`  | real          | Thread-level aggregate                                             |
+| `urgency_score`       | real          | Deterministic heuristic                                            |
+| `actionability_score` | real          | Deterministic heuristic                                            |
+| `priority_score`      | real          | Dashboard sort key                                                 |
+| `explanation_json`    | text nullable | Machine-readable explanation payload defined by the scoring rubric |
+| `is_current`          | boolean       | Latest run marker                                                  |
+| `computed_at`         | datetime      | Snapshot time                                                      |
 
 Primary key:
 
@@ -318,19 +318,19 @@ Decision:
 
 Persisted morning briefing snapshots generated from current thread scores.
 
-| Field | Type | Notes |
-| --- | --- | --- |
-| `briefing_entry_id` | text pk | Opaque local ID |
-| `scoring_run_id` | text fk | References `scoring_runs` |
-| `thread_id` | text fk | References `threads` |
-| `headline` | text | User-facing summary line |
-| `why_it_matters` | text | Reason for inclusion |
-| `suggested_next_action` | text nullable | Recommended next step |
-| `confidence` | real | Placeholder confidence value |
-| `generated_by` | text | `local_rules` in Phase 1 |
-| `rank_position` | integer | Display order |
-| `is_current` | boolean | Latest briefing marker |
-| `generated_at` | datetime | Snapshot time |
+| Field                   | Type          | Notes                        |
+| ----------------------- | ------------- | ---------------------------- |
+| `briefing_entry_id`     | text pk       | Opaque local ID              |
+| `scoring_run_id`        | text fk       | References `scoring_runs`    |
+| `thread_id`             | text fk       | References `threads`         |
+| `headline`              | text          | User-facing summary line     |
+| `why_it_matters`        | text          | Reason for inclusion         |
+| `suggested_next_action` | text nullable | Recommended next step        |
+| `confidence`            | real          | Placeholder confidence value |
+| `generated_by`          | text          | `local_rules` in Phase 1     |
+| `rank_position`         | integer       | Display order                |
+| `is_current`            | boolean       | Latest briefing marker       |
+| `generated_at`          | datetime      | Snapshot time                |
 
 Indexes:
 

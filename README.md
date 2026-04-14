@@ -69,3 +69,37 @@ This repository has an initial bootstrap skeleton for the desktop app, Rust
 workspace, contracts, and fixtures. The baseline product direction, interfaces,
 and backlog are still being documented before ingestion, persistence, and
 scoring logic are implemented in earnest.
+
+## Local Checks
+
+Install JavaScript dependencies from the repo root with `pnpm install`.
+
+Use these repo-level commands before opening or merging a PR:
+
+- `pnpm lint` runs frontend ESLint, Rust `clippy`, and lightweight JSON validation for contract and fixture files.
+- `pnpm format` applies Prettier across the repo and `cargo fmt --all` for Rust code.
+- `pnpm format:check` verifies formatting without rewriting files.
+- `pnpm build` runs the desktop Next.js build and `cargo build --workspace`.
+- `pnpm test` runs the desktop Node test suite and `cargo test --workspace`.
+
+Command scope is intentionally explicit:
+
+- JavaScript and TypeScript checks currently cover the `apps/desktop` package only.
+- Rust checks cover every crate in the workspace, including the Tauri shell crate.
+- Docs validation is limited to JSON-backed contracts, fixtures, and app config files. Markdown linting is not enforced yet.
+
+## PR Policy
+
+`main` should remain protected by required status checks once the first pre-merge
+GitHub Actions workflow lands. Until that workflow exists, this repository can
+document the intended gate but cannot safely require status checks without
+referencing non-existent job names.
+
+When the workflow is added, the branch protection policy should stay lightweight:
+
+- require the stable pre-merge jobs that map directly to `pnpm lint`, `pnpm build`, and `pnpm test`
+- require branches to be up to date before merge
+- require one approval for external contributors; owner-authored maintenance PRs can remain self-mergeable
+
+The pull request template reflects the local checks contributors are expected to
+run before merge.

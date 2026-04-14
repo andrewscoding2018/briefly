@@ -5,10 +5,13 @@ export default function HomePage() {
     <main className="page">
       <section className="hero">
         <p className="eyebrow">Briefly Bootstrap</p>
-        <h1>Workspace skeleton for the desktop shell, Rust services, and shared contracts.</h1>
+        <h1>
+          Workspace skeleton for the desktop shell, Rust services, and shared
+          contracts.
+        </h1>
         <p className="lede">
-          This is an intentional placeholder surface while ingestion, scoring, and
-          persistence move from docs into executable code.
+          This is an intentional placeholder surface while ingestion, scoring,
+          and persistence move from docs into executable code.
         </p>
       </section>
 
