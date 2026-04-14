@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+WORKSPACE_PATH="${CONDUCTOR_WORKSPACE_PATH:-${CODEX_WORKING_DIR:-$REPO_ROOT}}"
+WORKSPACE_NAME="${CONDUCTOR_WORKSPACE_NAME:-$(basename "$WORKSPACE_PATH")}"
+
+say() {
+  printf '%s\n' "$*"
+}
+
+fail() {
+  say "error: $*" >&2
+  exit 1
+}
+
+if [[ ! -d "${REPO_ROOT}/node_modules" ]]; then
+  fail "dependencies are not installed. Run ./scripts/setup first."
+fi
+
+say "Briefly run"
+say "workspace: ${WORKSPACE_NAME}"
+say "path: ${WORKSPACE_PATH}"
+
+if [[ -n "${CONDUCTOR_WORKSPACE_PATH:-}" ]]; then
+  say "conductor: detected"
+fi
+
+say "starting desktop development server via pnpm dev"
+cd "$REPO_ROOT"
+exec pnpm dev

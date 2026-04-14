@@ -1,0 +1,7 @@
+services:
+  checks:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    command: ./scripts/check

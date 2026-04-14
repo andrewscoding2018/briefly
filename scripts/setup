@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+WORKSPACE_PATH="${CONDUCTOR_WORKSPACE_PATH:-${CODEX_WORKING_DIR:-$REPO_ROOT}}"
+WORKSPACE_NAME="${CONDUCTOR_WORKSPACE_NAME:-$(basename "$WORKSPACE_PATH")}"
+DEFAULT_BRANCH="${CONDUCTOR_DEFAULT_BRANCH:-main}"
+CONDUCTOR_PORT_VALUE="${CONDUCTOR_PORT:-}"
+
+MINIMUM_NODE_MAJOR=22
+PREFERRED_NODE_MAJOR=22
+REQUIRED_PNPM_MAJOR=10
+
+say() {
+  printf '%s\n' "$*"
+}
+
+fail() {
+  say "error: $*" >&2
+  exit 1
+}
+
+warn() {
+  say "warning: $*" >&2
+}
+
+require_command() {
+  local command_name="$1"
+  local install_hint="$2"
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    fail "missing '$command_name'. ${install_hint}"
+  fi
+}
+
+version_major() {
+  local version="$1"
+  version="${version#v}"
+  version="${version%%.*}"
+  printf '%s' "$version"
+}
+
+say "Briefly setup"
+say "workspace: ${WORKSPACE_NAME}"
+say "path: ${WORKSPACE_PATH}"
+
+if [[ -n "${CONDUCTOR_WORKSPACE_PATH:-}" ]]; then
+  say "conductor: detected"
+  say "default branch: ${DEFAULT_BRANCH}"
+  if [[ -n "$CONDUCTOR_PORT_VALUE" ]]; then
+    say "conductor port: ${CONDUCTOR_PORT_VALUE}"
+  fi
+else
+  say "conductor: not detected"
+fi
+
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  fail "this setup script currently targets macOS because the repo's primary app is a Tauri desktop shell."
+fi
+
+require_command node "Install Node.js 22.x before running setup."
+require_command pnpm "Install pnpm 10.x, for example: corepack enable && corepack prepare pnpm@10.0.0 --activate"
+require_command rustup "Install Rust stable from https://rustup.rs/ before running setup."
+require_command cargo "Install Rust stable from https://rustup.rs/ before running setup."
+
+NODE_VERSION="$(node --version)"
+NODE_MAJOR="$(version_major "$NODE_VERSION")"
+if (( NODE_MAJOR < MINIMUM_NODE_MAJOR )); then
+  fail "expected Node.js ${MINIMUM_NODE_MAJOR}.x or newer, found ${NODE_VERSION}. Align with the repo baseline before continuing."
+fi
+if [[ "$NODE_MAJOR" != "$PREFERRED_NODE_MAJOR" ]]; then
+  warn "CI is pinned to Node.js ${PREFERRED_NODE_MAJOR}.x. Continuing with ${NODE_VERSION} in this workspace."
+fi
+say "node: ${NODE_VERSION}"
+
+PNPM_VERSION="$(pnpm --version)"
+PNPM_MAJOR="$(version_major "$PNPM_VERSION")"
+if [[ "$PNPM_MAJOR" != "$REQUIRED_PNPM_MAJOR" ]]; then
+  fail "expected pnpm ${REQUIRED_PNPM_MAJOR}.x, found ${PNPM_VERSION}. Run: corepack prepare pnpm@10.0.0 --activate"
+fi
+say "pnpm: ${PNPM_VERSION}"
+
+RUST_TOOLCHAIN="$(rustup show active-toolchain || true)"
+if [[ "$RUST_TOOLCHAIN" != stable-* ]]; then
+  fail "expected the Rust stable toolchain to be active. Run: rustup default stable"
+fi
+say "rust: ${RUST_TOOLCHAIN}"
+
+for component in clippy rustfmt; do
+  if ! rustup component list --installed | grep -Eq "^${component}(-preview)?(-[^ ]+)?$"; then
+    fail "missing Rust component '${component}'. Run: rustup component add ${component}"
+  fi
+done
+say "rust components: clippy, rustfmt"
+
+if ! xcode-select -p >/dev/null 2>&1; then
+  fail "Xcode Command Line Tools are not installed. Run: xcode-select --install"
+fi
+say "xcode command line tools: installed"
+
+say "installing JavaScript dependencies with pnpm install"
+(
+  cd "$REPO_ROOT"
+  pnpm install
+)
+
+say "setup complete"

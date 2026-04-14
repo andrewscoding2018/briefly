@@ -70,9 +70,44 @@ workspace, contracts, and fixtures. The baseline product direction, interfaces,
 and backlog are still being documented before ingestion, persistence, and
 scoring logic are implemented in earnest.
 
-## Local Checks
+## Local Setup
 
-Install JavaScript dependencies from the repo root with `pnpm install`.
+Use the repo-owned scripts for day-to-day development:
+
+- `./scripts/setup` verifies the current macOS host prerequisites, prints
+  Conductor-aware workspace context when available, and installs JavaScript
+  dependencies with `pnpm install`.
+- `./scripts/run` starts the desktop development server through the repo-level
+  `pnpm dev` command.
+- `./scripts/check` runs the full validation surface and is the preferred
+  portable entrypoint for Docker or CI because it does not rely on a desktop GUI
+  session.
+- `docker compose run --rm checks` runs the same validation surface inside the
+  repo's container image.
+
+Current host prerequisites:
+
+- Node.js 22.x
+- `pnpm` 10.x
+- Rust stable with `clippy` and `rustfmt`
+- Xcode Command Line Tools on macOS
+
+The setup flow intentionally verifies these tools and points to manual install
+steps when they are missing instead of trying to mutate the host automatically.
+
+## Docker
+
+The repository includes a `Dockerfile` and `docker-compose.yml` for portable
+validation. This container path is intentionally limited to `./scripts/check`,
+which runs lint, build, and test. It does not try to run the Tauri desktop app
+inside Docker.
+
+Use:
+
+- `docker compose build checks`
+- `docker compose run --rm checks`
+
+## Local Checks
 
 Use these repo-level commands before opening or merging a PR:
 
