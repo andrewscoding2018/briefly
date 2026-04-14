@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  typescript-checks:
-    name: typescript-checks
+  lint:
+    name: lint
     runs-on: ubuntu-latest
 
     steps:
@@ -24,25 +24,38 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Install TypeScript workspace dependencies
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run TypeScript workspace lint
+      - name: Run lint checks
         run: pnpm lint
 
-      - name: Run TypeScript workspace build
-        run: pnpm build
-
-      - name: Run TypeScript workspace tests
-        run: pnpm test
-
-  rust-checks:
-    name: rust-checks
+  build:
+    name: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
 
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -52,14 +65,41 @@ jobs:
       - name: Cache Rust artifacts
         uses: Swatinem/rust-cache@v2
 
-      - name: Check Rust formatting
-        run: cargo fmt --all --check
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Run Rust lint
-        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Run build checks
+        run: pnpm build
 
-      - name: Run Rust build
-        run: cargo build --workspace --locked
+  test:
+    name: test
+    runs-on: ubuntu-latest
 
-      - name: Run Rust tests
-        run: cargo test --workspace --locked
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run test checks
+        run: pnpm test

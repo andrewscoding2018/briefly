@@ -90,16 +90,14 @@ Command scope is intentionally explicit:
 
 ## PR Policy
 
-`main` should remain protected by required status checks once the first pre-merge
-GitHub Actions workflow lands. Until that workflow exists, this repository can
-document the intended gate but cannot safely require status checks without
-referencing non-existent job names.
+`main` should stay protected by a lightweight required-check policy that matches
+the repository's actual GitHub Actions workflow and local contributor commands.
 
-When the workflow is added, the branch protection policy should stay lightweight:
+The current branch protection policy for `main` is:
 
-- require the stable pre-merge jobs that map directly to `pnpm lint`, `pnpm build`, and `pnpm test`
+- require the stable pre-merge jobs `lint`, `build`, and `test`
 - require branches to be up to date before merge
-- require one approval for external contributors; owner-authored maintenance PRs can remain self-mergeable
+- keep reviewer requirements lightweight; external contributors should still get one approval, while owner-authored maintenance PRs can remain self-mergeable when appropriate
 
 The pull request template reflects the local checks contributors are expected to
 run before merge.
