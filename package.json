@@ -3,6 +3,9 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
+    "setup": "./scripts/setup",
+    "run": "./scripts/run",
+    "check": "./scripts/check",
     "install:js": "pnpm install",
     "dev": "pnpm --filter desktop dev",
     "build": "pnpm build:js && pnpm build:rust",
