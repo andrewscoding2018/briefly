@@ -1,5 +1,7 @@
+#[cfg(any(target_os = "macos", test))]
 use std::path::PathBuf;
 
+#[cfg(any(target_os = "macos", test))]
 use briefly_contracts::{DesktopImportLifecycle, DesktopImportResponse, ImportBatchStatus};
 
 #[cfg(target_os = "macos")]
