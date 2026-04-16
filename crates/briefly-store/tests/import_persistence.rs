@@ -97,6 +97,70 @@ fn repeated_imports_add_batches_without_duplicating_canonical_rows() {
 }
 
 #[test]
+fn repeated_imports_reuse_canonical_participant_ids_for_matching_emails() {
+    let mut store = briefly_store::Store::open_in_memory().expect("store should initialize");
+    let first = fixture_output();
+    let mut second = fixture_output();
+
+    second.import_batch_id = "bat_conflict".to_string();
+    second.imported_at = "2026-04-15T14:00:00Z".to_string();
+    second.accepted_messages[0].message_key = "msg_conflict".to_string();
+    second.accepted_messages[0].raw_message_id = Some("conflict@example.com".to_string());
+    second.accepted_messages[0].sender_participant_id = "par_new_sender".to_string();
+    second.accepted_messages[0].sender.participant_id = "par_new_sender".to_string();
+    second.accepted_messages[0].to[0].participant_id = "par_new_recipient".to_string();
+    second.participants[0].participant_id = "par_new_sender".to_string();
+    second.participants[1].participant_id = "par_new_recipient".to_string();
+
+    store
+        .persist_import_batch(&first)
+        .expect("first import should persist");
+    store
+        .persist_import_batch(&second)
+        .expect("second import should persist");
+
+    let connection = store.connection();
+
+    let participant_count: i64 = connection
+        .query_row("SELECT COUNT(*) FROM participants", [], |row| row.get(0))
+        .expect("participant count should query");
+    let canonical_sender_id: String = connection
+        .query_row(
+            "SELECT participant_id FROM participants WHERE normalized_email = 'founder@example.com'",
+            [],
+            |row| row.get(0),
+        )
+        .expect("sender participant should exist");
+    let canonical_recipient_id: String = connection
+        .query_row(
+            "SELECT participant_id FROM participants WHERE normalized_email = 'operator@example.com'",
+            [],
+            |row| row.get(0),
+        )
+        .expect("recipient participant should exist");
+    let latest_message_sender_id: String = connection
+        .query_row(
+            "SELECT sender_participant_id FROM messages WHERE canonical_message_key = 'msg_conflict'",
+            [],
+            |row| row.get(0),
+        )
+        .expect("latest message should persist");
+    let recipient_links: i64 = connection
+        .query_row(
+            "SELECT COUNT(*) FROM message_participants WHERE message_id = (SELECT message_id FROM messages WHERE canonical_message_key = 'msg_conflict') AND participant_id = ?1",
+            [canonical_recipient_id.as_str()],
+            |row| row.get(0),
+        )
+        .expect("message participant should reference canonical recipient");
+
+    assert_eq!(participant_count, 2);
+    assert_eq!(canonical_sender_id, first.participants[0].participant_id);
+    assert_eq!(canonical_recipient_id, first.participants[1].participant_id);
+    assert_eq!(latest_message_sender_id, canonical_sender_id);
+    assert_eq!(recipient_links, 1);
+}
+
+#[test]
 fn partial_imports_keep_diagnostics_queryable() {
     let mut store = briefly_store::Store::open_in_memory().expect("store should initialize");
     let accepted_sender = Participant {

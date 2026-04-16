@@ -1,7 +1,7 @@
 use briefly_contracts::{ImportBatchOutput, ImportBatchStatus, NormalizedMessage, Participant};
 use rusqlite::{params, Connection, OptionalExtension, Transaction};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
 use std::ffi::OsStr;
 use std::path::Path;
 
@@ -207,12 +207,24 @@ fn persist_import_batch(
         ],
     )?;
 
+    let mut canonical_participant_ids = HashMap::new();
     for participant in &output.participants {
-        upsert_participant(tx, participant, output.imported_at.as_str())?;
+        let canonical_participant_id =
+            upsert_participant(tx, participant, output.imported_at.as_str())?;
+        canonical_participant_ids.insert(
+            participant.participant_id.clone(),
+            canonical_participant_id,
+        );
     }
+    let accepted_messages = output
+        .accepted_messages
+        .iter()
+        .map(|message| canonicalize_message_participants(message, &canonical_participant_ids))
+        .collect::<Vec<_>>();
 
     for thread in &output.threads {
-        let participant_count = participant_ids_for_thread(&output.accepted_messages, &thread.thread_id).len() as i64;
+        let participant_count =
+            participant_ids_for_thread(&accepted_messages, &thread.thread_id).len() as i64;
         tx.execute(
             "INSERT INTO threads (
                 thread_id,
@@ -252,32 +264,36 @@ fn persist_import_batch(
 
     let accepted_positions = accepted_source_positions(output);
 
-    for (accepted_index, message) in output.accepted_messages.iter().enumerate() {
+    for (accepted_index, message) in accepted_messages.iter().enumerate() {
         let message_id = ensure_message(tx, output, &stored_import_batch_id, message)?;
         sync_message_participants(tx, &message_id, message)?;
         let source_position = accepted_positions[accepted_index];
         insert_message_source(
             tx,
-            &stored_import_batch_id,
-            Some(&message_id),
-            source_position,
-            "parsed",
-            None,
-            &format!("accepted:{}", message.message_key),
-            output.imported_at.as_str(),
+            MessageSourceInsert {
+                import_batch_id: &stored_import_batch_id,
+                message_id: Some(&message_id),
+                source_position,
+                parse_status: "parsed",
+                parse_error: None,
+                raw_seed: format!("accepted:{}", message.message_key),
+                created_at: output.imported_at.as_str(),
+            },
         )?;
     }
 
     for rejected in &output.rejected_messages {
         insert_message_source(
             tx,
-            &stored_import_batch_id,
-            None,
-            rejected.source_index,
-            "failed",
-            Some(rejected.reason.as_str()),
-            &format!("rejected:{}:{}", rejected.source_index, rejected.reason),
-            output.imported_at.as_str(),
+            MessageSourceInsert {
+                import_batch_id: &stored_import_batch_id,
+                message_id: None,
+                source_position: rejected.source_index,
+                parse_status: "failed",
+                parse_error: Some(rejected.reason.as_str()),
+                raw_seed: format!("rejected:{}:{}", rejected.source_index, rejected.reason),
+                created_at: output.imported_at.as_str(),
+            },
         )?;
     }
 
@@ -292,7 +308,7 @@ fn upsert_participant(
     tx: &Transaction<'_>,
     participant: &Participant,
     imported_at: &str,
-) -> rusqlite::Result<()> {
+) -> rusqlite::Result<String> {
     tx.execute(
         "INSERT INTO participants (
             participant_id,
@@ -323,7 +339,11 @@ fn upsert_participant(
         ],
     )?;
 
-    Ok(())
+    tx.query_row(
+        "SELECT participant_id FROM participants WHERE normalized_email = ?1",
+        params![participant.email],
+        |row| row.get(0),
+    )
 }
 
 fn ensure_message(
@@ -439,17 +459,14 @@ fn insert_message_participant(
 
 fn insert_message_source(
     tx: &Transaction<'_>,
-    import_batch_id: &str,
-    message_id: Option<&str>,
-    source_position: usize,
-    parse_status: &str,
-    parse_error: Option<&str>,
-    raw_seed: &str,
-    created_at: &str,
+    insert: MessageSourceInsert<'_>,
 ) -> rusqlite::Result<()> {
     let source_record_id = prefixed_digest(
         "src",
-        &format!("{import_batch_id}:{source_position}:{parse_status}:{raw_seed}"),
+        &format!(
+            "{}:{}:{}:{}",
+            insert.import_batch_id, insert.source_position, insert.parse_status, insert.raw_seed
+        ),
     );
 
     tx.execute(
@@ -467,19 +484,76 @@ fn insert_message_source(
         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
         params![
             source_record_id,
-            import_batch_id,
-            message_id,
+            insert.import_batch_id,
+            insert.message_id,
             Option::<String>::None,
-            source_position as i64,
-            hex_digest(raw_seed),
+            insert.source_position as i64,
+            hex_digest(&insert.raw_seed),
             Option::<String>::None,
-            parse_status,
-            parse_error,
-            created_at,
+            insert.parse_status,
+            insert.parse_error,
+            insert.created_at,
         ],
     )?;
 
     Ok(())
+}
+
+struct MessageSourceInsert<'a> {
+    import_batch_id: &'a str,
+    message_id: Option<&'a str>,
+    source_position: usize,
+    parse_status: &'a str,
+    parse_error: Option<&'a str>,
+    raw_seed: String,
+    created_at: &'a str,
+}
+
+fn canonicalize_message_participants(
+    message: &NormalizedMessage,
+    canonical_participant_ids: &HashMap<String, String>,
+) -> NormalizedMessage {
+    let mut canonical_message = message.clone();
+    canonical_message.sender_participant_id =
+        canonical_participant_id(canonical_participant_ids, &message.sender_participant_id);
+    canonical_message.sender =
+        canonicalize_participant(&message.sender, canonical_participant_ids);
+    canonical_message.to = canonicalize_participant_list(&message.to, canonical_participant_ids);
+    canonical_message.cc = canonicalize_participant_list(&message.cc, canonical_participant_ids);
+    canonical_message.bcc = canonicalize_participant_list(&message.bcc, canonical_participant_ids);
+    canonical_message.reply_to =
+        canonicalize_participant_list(&message.reply_to, canonical_participant_ids);
+    canonical_message
+}
+
+fn canonicalize_participant_list(
+    participants: &[Participant],
+    canonical_participant_ids: &HashMap<String, String>,
+) -> Vec<Participant> {
+    participants
+        .iter()
+        .map(|participant| canonicalize_participant(participant, canonical_participant_ids))
+        .collect()
+}
+
+fn canonicalize_participant(
+    participant: &Participant,
+    canonical_participant_ids: &HashMap<String, String>,
+) -> Participant {
+    let mut canonical_participant = participant.clone();
+    canonical_participant.participant_id =
+        canonical_participant_id(canonical_participant_ids, &participant.participant_id);
+    canonical_participant
+}
+
+fn canonical_participant_id(
+    canonical_participant_ids: &HashMap<String, String>,
+    participant_id: &str,
+) -> String {
+    canonical_participant_ids
+        .get(participant_id)
+        .cloned()
+        .unwrap_or_else(|| participant_id.to_string())
 }
 
 fn participant_ids_for_thread(messages: &[NormalizedMessage], thread_id: &str) -> BTreeSet<String> {
