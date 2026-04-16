@@ -30,6 +30,23 @@ pub fn bootstrap_banner() -> &'static str {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum DesktopImportLifecycle {
+    Running,
+    Completed,
+    Partial,
+    Failed,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DesktopImportResponse {
+    pub lifecycle: DesktopImportLifecycle,
+    pub selected_path: Option<String>,
+    pub batch: Option<ImportBatchOutput>,
+    pub error_message: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ImportBatchOutput {
     pub import_batch_id: String,
     pub source_path: String,
@@ -111,6 +128,14 @@ mod tests {
         assert_eq!(
             serde_json::to_string(&ImportBatchStatus::Partial).unwrap(),
             "\"partial\""
+        );
+    }
+
+    #[test]
+    fn desktop_import_lifecycle_serializes_to_snake_case() {
+        assert_eq!(
+            serde_json::to_string(&DesktopImportLifecycle::Running).unwrap(),
+            "\"running\""
         );
     }
 }
