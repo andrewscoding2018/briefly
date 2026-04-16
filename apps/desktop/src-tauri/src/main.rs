@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use briefly_contracts::{DesktopImportLifecycle, DesktopImportResponse, ImportBatchStatus};
 
+#[cfg(target_os = "macos")]
 #[tauri::command]
 async fn import_mailbox(path: String) -> DesktopImportResponse {
     import_mailbox_from_path(path)
@@ -41,12 +42,18 @@ fn import_mailbox_from_path(path: String) -> DesktopImportResponse {
     }
 }
 
+#[cfg(target_os = "macos")]
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![import_mailbox])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(not(target_os = "macos"))]
+fn main() {
+    println!("Briefly desktop shell is only supported on macOS in Phase 1.");
 }
 
 #[cfg(test)]
