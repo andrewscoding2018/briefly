@@ -209,7 +209,9 @@ name = "briefly-store"
 version = "0.1.0"
 dependencies = [
  "briefly-contracts",
+ "briefly-ingest",
  "rusqlite",
+ "sha2",
 ]
 
 [[package]]

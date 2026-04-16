@@ -7,3 +7,7 @@ license.workspace = true
 [dependencies]
 briefly-contracts = { path = "../briefly-contracts" }
 rusqlite = { version = "0.32", features = ["bundled"] }
+sha2 = "0.10"
+
+[dev-dependencies]
+briefly-ingest = { path = "../briefly-ingest" }
