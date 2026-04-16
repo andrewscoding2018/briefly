@@ -63,6 +63,8 @@ Phase 1 is intentionally useful without any cloud dependency or AI provider conf
 - [Signal scoring rubric](docs/signal-scoring-rubric.md)
 - [Architecture decision records](docs/adr/README.md)
 
+Plan tracking lives in the [implementation plan](docs/implementation-plan.md). Major workstreams should carry a status marker plus links to the owning GitHub issue and any ADR that records the tradeoff behind the work.
+
 ## Current Status
 
 This repository has an initial bootstrap skeleton for the desktop app, Rust

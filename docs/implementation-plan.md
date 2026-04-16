@@ -25,6 +25,25 @@ The Phase 1 normalized schema, persistence boundaries, and update rules are defi
 - Full AI dependence for ranking or usability
 - Fine-tuned or self-hosted model infrastructure
 
+## Plan Tracking Conventions
+
+Use the implementation plan as the source of truth for execution status.
+
+| Marker | Meaning |
+| ------ | ------- |
+| `[planned]` | Scoped and agreed, but implementation has not started |
+| `[in-progress]` | Active work is underway on an open branch or PR |
+| `[done]` | Merged to `main` and reflected in repo docs or code |
+| `[blocked]` | Cannot proceed because a dependency is unresolved |
+| `[deferred]` | Explicitly pushed out of the current phase |
+
+Tracking rules:
+
+- Every major plan item should link its primary GitHub issue in the execution tracker.
+- When a task resolves a lasting architecture, schema, or product tradeoff, add or update an ADR and link it in the `Decision Record` column before marking the task `[done]`.
+- Use pull requests to show implementation history; use ADRs to show why a non-trivial decision was made.
+- Only mark a task `[done]` after the change is merged to `main`.
+
 ## MVP Scope
 
 Phase 1 is a desktop demo that:
@@ -225,6 +244,20 @@ The exact Phase 1 weights, penalties, and explanation contract are defined in th
 - What scoring weights best reflect the desired meaning of "signals-first"?
 - Which specific model fallback policy should be used in Phase 2 beyond the initial `/v1/responses` preference?
 - What observability vendor, if any, should trace AI execution later?
+
+## Execution Tracker
+
+| Workstream | Status | Tracking Issue | Decision Record |
+| ---------- | ------ | -------------- | --------------- |
+| Documentation baseline and discovery backlog | `[done]` | #1, #2, #3, #4, #5 | [ADR-0001](adr/0001-local-first-desktop-architecture.md), [ADR-0002](adr/0002-phase-1-mbox-ingestion-before-live-sync.md), [ADR-0003](adr/0003-managed-ai-via-digitalocean-gradient.md) |
+| Repo bootstrap skeleton and local contributor workflow | `[done]` | #6, #15, #16, #17, #18, #19, #21 | [Repo bootstrap plan](repo-bootstrap-plan.md) |
+| Main branch protection for required pre-merge checks | `[in-progress]` | #23 | README PR policy |
+| Desktop mailbox import flow and Tauri ingest command | `[planned]` | #33 | [ADR-0001](adr/0001-local-first-desktop-architecture.md), [ADR-0002](adr/0002-phase-1-mbox-ingestion-before-live-sync.md) |
+| SQLite persistence for normalized imports and provenance | `[planned]` | #29 | [Local data model](local-data-model.md) |
+| Deterministic scoring pipeline and explanation payloads | `[planned]` | #31 | [Signal scoring rubric](signal-scoring-rubric.md) |
+| Focus dashboard read model and ranked thread UI | `[planned]` | #32 | [Phase 1 product spec](phase-1-product-spec.md) |
+| Morning briefing snapshots and frontend view | `[planned]` | #30 | [Phase 1 product spec](phase-1-product-spec.md) |
+| Optional AI enrichment and provider configuration | `[deferred]` | None yet | [ADR-0003](adr/0003-managed-ai-via-digitalocean-gradient.md) |
 
 ## Proposed Repo Bootstrap Sequence
 
