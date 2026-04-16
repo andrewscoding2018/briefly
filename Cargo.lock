@@ -182,6 +182,8 @@ version = "0.1.0"
 dependencies = [
  "briefly-contracts",
  "briefly-ingest",
+ "briefly-score",
+ "briefly-store",
  "serde",
  "tauri",
  "tauri-build",
@@ -202,6 +204,12 @@ name = "briefly-score"
 version = "0.1.0"
 dependencies = [
  "briefly-contracts",
+ "briefly-store",
+ "chrono",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2",
 ]
 
 [[package]]
@@ -211,6 +219,8 @@ dependencies = [
  "briefly-contracts",
  "briefly-ingest",
  "rusqlite",
+ "serde",
+ "serde_json",
  "sha2",
 ]
 

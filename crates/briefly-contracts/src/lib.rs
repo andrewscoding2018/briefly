@@ -47,6 +47,53 @@ pub struct DesktopImportResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ScoringRunStatus {
+    Running,
+    Completed,
+    Failed,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct FocusDashboardResponse {
+    pub generated_at: Option<String>,
+    pub has_imported_mailbox: bool,
+    pub last_import_status: Option<ImportBatchStatus>,
+    pub last_scoring_status: Option<ScoringRunStatus>,
+    pub threads: Vec<RankedThreadCard>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct RankedThreadCard {
+    pub thread_id: String,
+    pub canonical_subject: Option<String>,
+    pub latest_message_at: Option<String>,
+    pub latest_message_preview: Option<String>,
+    pub message_count: usize,
+    pub participants: Vec<Participant>,
+    pub scores: ThreadComponentScores,
+    pub explanation: ScoreExplanationPayload,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ThreadComponentScores {
+    pub relationship_score: f64,
+    pub actionability_score: f64,
+    pub urgency_score: f64,
+    pub recency_score: f64,
+    pub priority_score: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ScoreExplanationPayload {
+    pub version: String,
+    pub top_reasons: Vec<String>,
+    pub component_scores: ThreadComponentScores,
+    pub matched_signals: Vec<String>,
+    pub applied_penalties: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ImportBatchOutput {
     pub import_batch_id: String,
     pub source_path: String,

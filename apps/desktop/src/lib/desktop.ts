@@ -1,4 +1,7 @@
-import type { DesktopImportResponse } from "@/lib/contracts";
+import type {
+  DesktopImportResponse,
+  FocusDashboardResponse,
+} from "@/lib/contracts";
 
 export async function isDesktopRuntime() {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -18,4 +21,9 @@ export async function pickMailboxPath() {
 export async function importMailbox(path: string) {
   const { invoke } = await import("@tauri-apps/api/core");
   return invoke<DesktopImportResponse>("import_mailbox", { path });
+}
+
+export async function loadFocusDashboard() {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke<FocusDashboardResponse>("load_focus_dashboard");
 }

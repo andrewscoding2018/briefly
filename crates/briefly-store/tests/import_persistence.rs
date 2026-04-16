@@ -41,7 +41,9 @@ fn persisting_fixture_import_writes_canonical_rows_and_provenance() {
         .query_row("SELECT COUNT(*) FROM message_sources", [], |row| row.get(0))
         .expect("source count should query");
     let message_participant_count: i64 = connection
-        .query_row("SELECT COUNT(*) FROM message_participants", [], |row| row.get(0))
+        .query_row("SELECT COUNT(*) FROM message_participants", [], |row| {
+            row.get(0)
+        })
         .expect("participant links should query");
 
     assert_eq!(import_batch_count, 1);
@@ -237,7 +239,9 @@ fn partial_imports_keep_diagnostics_queryable() {
             )
             .expect("source query should prepare");
         statement
-            .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)))
+            .query_map([], |row| {
+                Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?))
+            })
             .expect("source query should run")
             .collect::<Result<Vec<_>, _>>()
             .expect("source rows should collect")
@@ -246,7 +250,10 @@ fn partial_imports_keep_diagnostics_queryable() {
     assert_eq!(batch_row.0, "partial");
     assert_eq!(batch_row.1, 1);
     assert_eq!(batch_row.2, 1);
-    assert!(batch_row.3.expect("notes should exist").contains("missing sender identity"));
+    assert!(batch_row
+        .3
+        .expect("notes should exist")
+        .contains("missing sender identity"));
     assert_eq!(source_rows.len(), 2);
     assert_eq!(source_rows[0].1, "parsed");
     assert!(source_rows[0].0.is_some());

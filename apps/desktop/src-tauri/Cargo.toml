@@ -5,6 +5,8 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+briefly-score = { path = "../../../crates/briefly-score" }
+briefly-store = { path = "../../../crates/briefly-store" }
 briefly-ingest = { path = "../../../crates/briefly-ingest" }
 briefly-contracts = { path = "../../../crates/briefly-contracts" }
 serde.workspace = true
