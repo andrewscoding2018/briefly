@@ -962,7 +962,10 @@ mod tests {
             .top_reasons
             .contains(&"Direct ask detected".to_string()));
         assert_eq!(dashboard.threads[1].thread_id, "thr_bulk");
-        assert!(dashboard.threads[1].explanation.applied_penalties.len() >= 1);
+        assert!(!dashboard.threads[1]
+            .explanation
+            .applied_penalties
+            .is_empty());
     }
 
     #[test]
