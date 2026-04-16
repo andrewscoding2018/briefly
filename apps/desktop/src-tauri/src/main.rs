@@ -8,6 +8,7 @@ async fn import_mailbox(path: String) -> DesktopImportResponse {
     import_mailbox_from_path(path)
 }
 
+#[cfg(any(target_os = "macos", test))]
 fn import_mailbox_from_path(path: String) -> DesktopImportResponse {
     let trimmed_path = path.trim().to_string();
 
