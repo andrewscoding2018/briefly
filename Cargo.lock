@@ -184,6 +184,7 @@ dependencies = [
  "briefly-ingest",
  "briefly-score",
  "briefly-store",
+ "dirs",
  "serde",
  "tauri",
  "tauri-build",

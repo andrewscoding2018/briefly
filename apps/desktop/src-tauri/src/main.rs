@@ -21,7 +21,19 @@ async fn load_focus_dashboard() -> Result<FocusDashboardResponse, String> {
 
 #[cfg(any(target_os = "macos", test))]
 fn import_mailbox_from_path(path: String) -> DesktopImportResponse {
-    let store_path = default_store_path();
+    let store_path = match default_store_path() {
+        Ok(path) => path,
+        Err(error) => {
+            return DesktopImportResponse {
+                lifecycle: DesktopImportLifecycle::Failed,
+                selected_path: None,
+                batch: None,
+                error_message: Some(format!(
+                    "Failed to resolve local store location: {error}"
+                )),
+            };
+        }
+    };
     import_mailbox_from_path_with_store(path, &store_path)
 }
 
@@ -82,10 +94,10 @@ fn persist_and_score_batch(
     Ok(())
 }
 
-#[cfg(any(target_os = "macos", test))]
+#[cfg(target_os = "macos")]
 fn load_focus_dashboard_from_default_store(
 ) -> Result<FocusDashboardResponse, Box<dyn std::error::Error>> {
-    let store_path = default_store_path();
+    let store_path = default_store_path()?;
     load_focus_dashboard_from_store(&store_path)
 }
 
@@ -98,15 +110,22 @@ fn load_focus_dashboard_from_store(
 }
 
 #[cfg(any(target_os = "macos", test))]
-fn default_store_path() -> PathBuf {
+fn default_store_path() -> std::io::Result<PathBuf> {
     if let Ok(path) = std::env::var("BRIEFLY_STORE_PATH") {
-        return PathBuf::from(path);
+        if !path.is_empty() {
+            return Ok(PathBuf::from(path));
+        }
     }
 
-    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    let context_dir = cwd.join(".context");
-    let _ = std::fs::create_dir_all(&context_dir);
-    context_dir.join("briefly.sqlite3")
+    let base = dirs::data_local_dir().ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "unable to locate a writable user data directory for the Briefly default store",
+        )
+    })?;
+    let app_dir = base.join("briefly");
+    std::fs::create_dir_all(&app_dir)?;
+    Ok(app_dir.join("briefly.sqlite3"))
 }
 
 #[cfg(target_os = "macos")]
@@ -134,6 +153,16 @@ mod tests {
     };
     use briefly_contracts::DesktopImportLifecycle;
     use std::path::PathBuf;
+    use std::sync::{Mutex, MutexGuard, OnceLock};
+
+    // Tests in this module mutate the process-global `BRIEFLY_STORE_PATH` env var,
+    // so they must be serialized to avoid racing against each other.
+    fn env_lock() -> MutexGuard<'static, ()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
 
     fn temp_store_path(name: &str) -> String {
         let path =
@@ -163,6 +192,7 @@ mod tests {
 
     #[test]
     fn rejects_unsupported_directory_input() {
+        let _guard = env_lock();
         let fixtures_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../fixtures");
         let store_path = temp_store_path("reject-dir");
         unsafe {
@@ -180,12 +210,35 @@ mod tests {
     }
 
     #[test]
-    fn default_store_path_prefers_context_directory() {
+    fn default_store_path_honors_env_override() {
+        let _guard = env_lock();
+        let override_path = temp_store_path("default-store-override");
+        unsafe {
+            std::env::set_var("BRIEFLY_STORE_PATH", &override_path);
+        }
+
+        let path = default_store_path().expect("default store path should resolve");
+        assert_eq!(path, PathBuf::from(&override_path));
+    }
+
+    #[test]
+    fn default_store_path_uses_user_data_dir_when_no_override() {
+        let _guard = env_lock();
         unsafe {
             std::env::remove_var("BRIEFLY_STORE_PATH");
         }
 
-        let path = default_store_path();
-        assert!(path.ends_with(".context/briefly.sqlite3"));
+        let path = default_store_path().expect("default store path should resolve");
+        let expected_base = dirs::data_local_dir()
+            .expect("data_local_dir must resolve on supported platforms")
+            .join("briefly");
+        assert!(
+            path.starts_with(&expected_base),
+            "expected {path:?} to live under {expected_base:?}"
+        );
+        assert_eq!(
+            path.file_name().and_then(|name| name.to_str()),
+            Some("briefly.sqlite3")
+        );
     }
 }
