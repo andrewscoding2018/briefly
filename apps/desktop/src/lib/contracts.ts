@@ -65,3 +65,40 @@ export type DesktopImportResponse = {
   batch: ImportBatchOutput | null;
   error_message: string | null;
 };
+
+export type ScoringRunStatus = "running" | "completed" | "failed";
+
+export type ThreadComponentScores = {
+  relationship_score: number;
+  actionability_score: number;
+  urgency_score: number;
+  recency_score: number;
+  priority_score: number;
+};
+
+export type ScoreExplanationPayload = {
+  version: string;
+  top_reasons: string[];
+  component_scores: ThreadComponentScores;
+  matched_signals: string[];
+  applied_penalties: string[];
+};
+
+export type RankedThreadCard = {
+  thread_id: string;
+  canonical_subject: string | null;
+  latest_message_at: string | null;
+  latest_message_preview: string | null;
+  message_count: number;
+  participants: Participant[];
+  scores: ThreadComponentScores;
+  explanation: ScoreExplanationPayload;
+};
+
+export type FocusDashboardResponse = {
+  generated_at: string | null;
+  has_imported_mailbox: boolean;
+  last_import_status: ImportBatchStatus | null;
+  last_scoring_status: ScoringRunStatus | null;
+  threads: RankedThreadCard[];
+};

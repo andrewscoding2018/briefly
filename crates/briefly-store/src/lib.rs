@@ -75,6 +75,10 @@ impl Store {
         &self.connection
     }
 
+    pub fn connection_mut(&mut self) -> &mut Connection {
+        &mut self.connection
+    }
+
     pub fn persist_import_batch(
         &mut self,
         output: &ImportBatchOutput,
@@ -161,7 +165,10 @@ fn persist_import_batch(
     tx: &Transaction<'_>,
     output: &ImportBatchOutput,
 ) -> rusqlite::Result<PersistImportReport> {
-    let stored_import_batch_id = prefixed_digest("imp", &format!("{}:{}", output.import_batch_id, output.imported_at));
+    let stored_import_batch_id = prefixed_digest(
+        "imp",
+        &format!("{}:{}", output.import_batch_id, output.imported_at),
+    );
     let source_filename = Path::new(&output.source_path)
         .file_name()
         .unwrap_or_else(|| OsStr::new(""))
@@ -211,10 +218,8 @@ fn persist_import_batch(
     for participant in &output.participants {
         let canonical_participant_id =
             upsert_participant(tx, participant, output.imported_at.as_str())?;
-        canonical_participant_ids.insert(
-            participant.participant_id.clone(),
-            canonical_participant_id,
-        );
+        canonical_participant_ids
+            .insert(participant.participant_id.clone(), canonical_participant_id);
     }
     let accepted_messages = output
         .accepted_messages
@@ -360,8 +365,8 @@ fn ensure_message(
         )
         .optional()?;
 
-    let message_id = existing_message_id
-        .unwrap_or_else(|| prefixed_digest("mid", &message.message_key));
+    let message_id =
+        existing_message_id.unwrap_or_else(|| prefixed_digest("mid", &message.message_key));
 
     tx.execute(
         "INSERT INTO messages (
@@ -431,7 +436,13 @@ fn sync_message_participants(
         insert_message_participant(tx, message_id, &participant.participant_id, "bcc", position)?;
     }
     for (position, participant) in message.reply_to.iter().enumerate() {
-        insert_message_participant(tx, message_id, &participant.participant_id, "reply_to", position)?;
+        insert_message_participant(
+            tx,
+            message_id,
+            &participant.participant_id,
+            "reply_to",
+            position,
+        )?;
     }
 
     Ok(())
@@ -516,8 +527,7 @@ fn canonicalize_message_participants(
     let mut canonical_message = message.clone();
     canonical_message.sender_participant_id =
         canonical_participant_id(canonical_participant_ids, &message.sender_participant_id);
-    canonical_message.sender =
-        canonicalize_participant(&message.sender, canonical_participant_ids);
+    canonical_message.sender = canonicalize_participant(&message.sender, canonical_participant_ids);
     canonical_message.to = canonicalize_participant_list(&message.to, canonical_participant_ids);
     canonical_message.cc = canonicalize_participant_list(&message.cc, canonical_participant_ids);
     canonical_message.bcc = canonicalize_participant_list(&message.bcc, canonical_participant_ids);
@@ -559,7 +569,10 @@ fn canonical_participant_id(
 fn participant_ids_for_thread(messages: &[NormalizedMessage], thread_id: &str) -> BTreeSet<String> {
     let mut participants = BTreeSet::new();
 
-    for message in messages.iter().filter(|message| message.thread_id == thread_id) {
+    for message in messages
+        .iter()
+        .filter(|message| message.thread_id == thread_id)
+    {
         participants.insert(message.sender_participant_id.clone());
         for participant in &message.to {
             participants.insert(participant.participant_id.clone());
@@ -682,12 +695,10 @@ mod tests {
             status: ImportBatchStatus::Partial,
             message_count_seen: 3,
             accepted_messages: vec![],
-            rejected_messages: vec![
-                briefly_contracts::RejectedMessage {
-                    source_index: 1,
-                    reason: "bad message".to_string(),
-                },
-            ],
+            rejected_messages: vec![briefly_contracts::RejectedMessage {
+                source_index: 1,
+                reason: "bad message".to_string(),
+            }],
             participants: vec![],
             threads: vec![],
         };
